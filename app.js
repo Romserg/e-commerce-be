@@ -1,27 +1,19 @@
-const express = require('express');
+import express from 'express';
+import morgan from 'morgan';
+import mongoose from 'mongoose';
+import 'dotenv/config';
+import { Product } from './models/product.js';
+
 const app = express();
-const morgan = require('morgan');
-const mongoose = require('mongoose');
-
-require('dotenv/config');
-
 const api = process.env.API_URL;
 
 app.use(express.json());
 app.use(morgan('tiny'));
 
-const productSchema = mongoose.Schema({
-  name: String,
-  image: String,
-  countInStock: Number,
-});
-
-const Product = mongoose.model('Product', productSchema);
-
 app.get(`${api}/products`, async (req, res) => {
   const productList = await Product.find();
   if (!productList) {
-    res.status(500).json({success: false})
+    res.status(500).json({ success: false });
   }
   res.send(productList);
 });
@@ -34,7 +26,7 @@ app.post(`${api}/products`, (req, res) => {
   });
   product.save()
     .then(createdProduct => {
-      res.status(201).json(createdProduct);
+      res.status(200).json(createdProduct);
     })
     .catch(err => {
       res.status(500).json({
