@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import 'dotenv/config';
+import cors from 'cors';
 import { router as productsRoutes } from './routes/products.js';
 import { router as categoriesRoutes } from './routes/categories.js';
 import { router as usersRoutes } from './routes/users.js';
@@ -11,6 +12,8 @@ const app = express();
 const api = process.env.API_URL;
 
 //Middleware
+app.use(cors());
+app.options('*', cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 
@@ -20,14 +23,16 @@ app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/users`, usersRoutes);
 app.use(`${api}/orders`, ordersRoutes);
 
+//Database
 mongoose.connect(process.env.CONNECTION_STRING)
   .then(() => {
     console.log('DB connected');
   })
-  .catch(e => {
-    console.log(e);
+  .catch(err => {
+    console.log(err);
   });
 
+//Server
 app.listen(3000, () => {
   console.log('Listening on http://localhost:3000');
 });
