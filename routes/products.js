@@ -5,7 +5,7 @@ import { Category } from '../models/category.js';
 const router = express.Router();
 
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find();
+  const productList = await Product.find().populate('category');
   if (!productList) {
     return res.status(500).json({ success: false });
   }
@@ -14,9 +14,9 @@ router.get(`/`, async (req, res) => {
 
 router.get(`/:id`, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate('category');
     if (!product) {
-      res.status(500).json({ success: false});
+      res.status(500).json({ success: false });
     }
     res.status(200).send(product);
   } catch (err) {
