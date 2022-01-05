@@ -16,7 +16,7 @@ router.get(`/:id`, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate('category');
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(400).json({ success: false, message: 'Product not found' });
     }
 
     return res.status(200).send(product);
@@ -99,9 +99,22 @@ router.delete(`/:id`, async (req, res) => {
   try {
     const product = await Product.findByIdAndRemove(req.params.id);
     if (!product)
-      return res.status(404).json({ success: false, message: 'Product with provided ID not found' });
+      return res.status(400).json({ success: false, message: 'Product with provided ID not found' });
 
     return res.status(200).json({ success: true, message: 'The product is deleted' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
+router.get(`/get/count`, async (req, res) => {
+  try {
+    const productsCount = await Product.countDocuments();
+    if (!productsCount) {
+      return res.status(400).json({ success: false, message: 'No products provided' });
+    }
+
+    return res.status(200).send({ productsCount });
   } catch (err) {
     return res.status(500).json({ success: false, error: err });
   }
