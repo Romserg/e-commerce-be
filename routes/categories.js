@@ -13,12 +13,17 @@ router.get(`/`, async (req, res) => {
 });
 
 router.get(`/:id`, async (req, res) => {
-  const category = await Category.findById(req.params.id);
+  try {
+    const category = await Category.findById(req.params.id);
 
-  if (!category) {
-    res.status(500).json({ success: false, message: 'Category not found' });
+    if (!category)
+      return res.status(500).json({ success: false, message: 'Category not found' });
+
+    return res.status(200).send(category);
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
   }
-  res.status(200).send(category);
+
 });
 
 router.post(`/`, async (req, res) => {
@@ -36,31 +41,36 @@ router.post(`/`, async (req, res) => {
 });
 
 router.put(`/:id`, async (req, res) => {
-  const category = await Category.findByIdAndUpdate(
-    req.params.id,
-    {
-      name: req.body.name,
-      icon: req.body.icon,
-      color: req.body.color,
-    },
-    { new: true },
-  );
+  try {
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+        icon: req.body.icon,
+        color: req.body.color,
+      },
+      { new: true },
+    );
 
-  if (!category)
-    return res.status(404).send('The category can\'t be updated');
+    if (!category)
+      return res.status(404).send('The category can\'t be updated');
 
-  res.status(200).send(category);
+    res.status(200).send(category);
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+
 });
 
 router.delete(`/:id`, async (req, res) => {
   try {
     const category = await Category.findByIdAndRemove(req.params.id);
     if (!category)
-      return res.status(404).json({ success: false, message: 'Category not found' });
+      return res.status(404).json({ success: false, message: 'Category with provided ID not found' });
 
     return res.status(200).json({ success: true, message: 'The category is deleted' });
   } catch (err) {
-    res.status(400).json({ success: false, error: err });
+    res.status(500).json({ success: false, error: err });
   }
 });
 
