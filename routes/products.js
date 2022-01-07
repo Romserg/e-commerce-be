@@ -5,7 +5,11 @@ import { Category } from '../models/category.js';
 const router = express.Router();
 
 router.get(`/`, async (req, res) => {
-  const productList = await Product.find().populate('category');
+  let queriedCategories = {};
+  if (req.query.categories) {
+    queriedCategories = { category: req.query.categories.split(',') };
+  }
+  const productList = await Product.find(queriedCategories).populate('category');
   if (!productList) {
     return res.status(500).json({ success: false });
   }
