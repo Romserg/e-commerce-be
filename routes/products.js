@@ -9,7 +9,7 @@ router.get(`/`, async (req, res) => {
   if (req.query.categories) {
     queriedCategories = { category: req.query.categories.split(',') };
   }
-  const productList = await Product.find(queriedCategories).populate('category');
+  const productList = await Product.find(queriedCategories).populate('category').select('name image -_id');
   if (!productList) {
     return res.status(500).json({ success: false });
   }
