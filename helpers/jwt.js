@@ -1,6 +1,6 @@
 import expressJwt from 'express-jwt';
 
-export function authJwt() {
+export const authJwt = () => {
   const secret = process.env.secret;
   return expressJwt({
     secret,
