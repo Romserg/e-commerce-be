@@ -8,6 +8,7 @@ import { router as categoriesRoutes } from './routes/categories.js';
 import { router as usersRoutes } from './routes/users.js';
 import { router as ordersRoutes } from './routes/orders.js';
 import { authJwt } from './helpers/jwt.js';
+import { errorHandler } from './helpers/error-handler.js';
 
 const app = express();
 const api = process.env.API_URL;
@@ -18,6 +19,7 @@ app.options('*', cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
+app.use(errorHandler);
 
 //Routes
 app.use(`${api}/categories`, categoriesRoutes);
