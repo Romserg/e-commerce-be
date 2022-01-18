@@ -131,4 +131,17 @@ router.post(`/register`, async (req, res) => {
   return res.status(200).send(user);
 })
 
+router.get(`/get/count`, async (req, res) => {
+  try {
+    const usersCount = await User.countDocuments();
+    if (!usersCount) {
+      return res.status(400).json({ success: false, message: 'No users provided' });
+    }
+
+    return res.status(200).send({ usersCount });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
 export { router };
