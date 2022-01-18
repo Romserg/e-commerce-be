@@ -85,6 +85,18 @@ router.put(`/:id`, async (req, res) => {
   }
 });
 
+router.delete(`/:id`, async (req, res) => {
+  try {
+    const user = await User.findByIdAndRemove(req.params.id);
+    if (!user)
+      return res.status(400).json({ success: false, message: 'User with provided ID not found' });
+
+    return res.status(200).json({ success: true, message: 'The user is deleted' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
 router.post(`/login`, async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
