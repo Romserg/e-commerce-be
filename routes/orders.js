@@ -5,7 +5,7 @@ import { OrderItem } from '../models/order-item.js';
 const router = express.Router();
 
 router.get(`/`, async (req, res) => {
-  const orderList = await Order.find();
+  const orderList = await Order.find().populate('user', 'name').sort('-dateOrdered');
 
   if (!orderList) {
     res.status(500).json({ success: false });
