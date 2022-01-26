@@ -64,4 +64,35 @@ router.post(`/`, async (req, res) => {
   return res.status(200).send(order);
 });
 
+router.put(`/:id`, async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      {
+        status: req.body.status,
+      },
+      { new: true },
+    );
+
+    if (!order)
+      return res.status(400).send('The order can\'t be updated');
+
+    return res.status(200).send(order);
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
+router.delete(`/:id`, async (req, res) => {
+  try {
+    const order = await Order.findByIdAndRemove(req.params.id);
+    if (!order)
+      return res.status(400).json({ success: false, message: 'Order with provided ID not found' });
+
+    return res.status(200).json({ success: true, message: 'The order is deleted' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
 export { router };
