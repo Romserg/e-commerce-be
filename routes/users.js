@@ -112,7 +112,7 @@ router.post(`/login`, async (req, res) => {
       },
       secret,
       {
-        expiresIn: '1d',
+        expiresIn: '1w',
       },
     );
 
