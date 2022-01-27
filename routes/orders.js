@@ -116,12 +116,26 @@ router.get(`/get/total-sales/`, async (req, res) => {
       return res.status(400).json({ success: false, message: 'The order sales can\'t be generated' });
     }
 
-    totalSales = totalSales.pop().totalSales
+    totalSales = totalSales.pop().totalSales;
 
     return res.status(200).send({ totalSales });
   } catch (err) {
     return res.status(500).json({ success: false, error: err });
   }
 });
+
+router.get(`/get/count`, async (req, res) => {
+  try {
+    const ordersCount = await Order.countDocuments();
+    if (!ordersCount) {
+      return res.status(400).json({ success: false, message: 'No orders provided' });
+    }
+
+    return res.status(200).send({ ordersCount });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
+});
+
 
 export { router };
