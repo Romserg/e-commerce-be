@@ -137,5 +137,25 @@ router.get(`/get/count`, async (req, res) => {
   }
 });
 
+router.get(`/get/user-orders/:userId`, async (req, res) => {
+  try {
+    const userOrderList = await Order.find({ user: req.params.userId })
+      .populate({
+        path: 'orderItems', populate: {
+          path: 'product', populate: {
+            path: 'category',
+          },
+        },
+      })
+      .sort('-dateOrdered');
+
+    if (!userOrderList) {
+      return res.status(400).json({ success: false, message: 'No orders provided' });
+    }
+    return res.send(userOrderList);
+  } catch (err) {
+    return res.status(500).json({ success: false, error: String(err) });
+  }
+});
 
 export { router };
