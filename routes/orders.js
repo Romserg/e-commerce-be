@@ -44,6 +44,15 @@ router.post(`/`, async (req, res) => {
     }),
   );
 
+  const totalPrices = await Promise.all(orderItemsIds.map(async orderItemId => {
+      const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
+
+      return orderItem.product.price * orderItem.quantity;
+    }),
+  );
+
+  const totalPrice = totalPrices.reduce((acc, value) => acc + value, 0);
+
   let order = new Order({
     orderItems: orderItemsIds,
     shippingAddress1: req.body.shippingAddress1,
@@ -53,7 +62,7 @@ router.post(`/`, async (req, res) => {
     country: req.body.country,
     phone: req.body.phone,
     status: req.body.status,
-    totalPrice: req.body.totalPrice,
+    totalPrice: totalPrice,
     user: req.body.user,
   });
   order = await order.save();
