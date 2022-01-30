@@ -1,6 +1,31 @@
 import express from 'express';
 import { Product } from '../models/product.js';
 import { Category } from '../models/category.js';
+import multer from 'multer';
+
+const FILE_TYPE_MAP = {
+  'image/png': 'png',
+  'image/jpeg': 'jpeg',
+  'image/jpg': 'jpg',
+};
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const isAllowedExtension = FILE_TYPE_MAP[file.mimetype];
+    let uploadError = new Error('Invalid image type');
+
+    if (isAllowedExtension) {
+      uploadError = null;
+    }
+    cb(uploadError, 'public/uploads');
+  },
+  filename: function (req, file, cb) {
+    const extension = FILE_TYPE_MAP[file.mimetype];
+    cb(null, `${file.fieldname}-${Date.now()}.${extension}`);
+  },
+});
+
+const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -29,7 +54,7 @@ router.get(`/:id`, async (req, res) => {
   }
 });
 
-router.post(`/`, async (req, res) => {
+router.post(`/`, upload.single('image'), async (req, res) => {
   try {
     const category = await Category.findById(req.body.category);
     if (!category)
@@ -38,11 +63,14 @@ router.post(`/`, async (req, res) => {
     return res.status(500).send(err);
   }
 
+  const imageFileName = req.file.filename;
+  const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+
   const product = new Product({
     name: req.body.name,
     description: req.body.description,
     richDescription: req.body.richDescription,
-    image: req.body.image,
+    image: `${basePath}${imageFileName}`,
     brand: req.body.brand,
     price: req.body.price,
     category: req.body.category,
