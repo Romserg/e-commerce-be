@@ -59,6 +59,9 @@ router.post(`/`, upload.single('image'), async (req, res) => {
     const category = await Category.findById(req.body.category);
     if (!category)
       return res.status(400).send('Invalid category');
+    const file = req.file;
+    if (!file)
+      return res.status(400).send('No image in the request');
   } catch (err) {
     return res.status(500).send(err);
   }
