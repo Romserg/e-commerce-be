@@ -94,26 +94,42 @@ router.post(`/`, upload.single('image'), async (req, res) => {
   return res.status(200).send(createdProduct);
 });
 
-router.put(`/:id`, async (req, res) => {
+router.put(`/:id`, upload.single('image'), async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id))
     return res.status(400).send('Invalid Product Id');
 
   try {
     const category = await Category.findById(req.body.category);
-    if (!category)
+    if (!category) {
       return res.status(400).send('Invalid category');
+    }
   } catch (err) {
     return res.status(500).send(err);
   }
 
+  const product = await Product.findById(req.params.id).populate('category');
+  if (!product) {
+    return res.status(400).json({ success: false, message: 'Product not found' });
+  }
+
+  const file = req.file;
+  let imagePath;
+
+  if (file) {
+    const imageFileName = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    imagePath = `${basePath}${imageFileName}`;
+  } else {
+    imagePath = product.image;
+  }
   try {
-    const product = await Product.findByIdAndUpdate(
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       {
         name: req.body.name,
         description: req.body.description,
         richDescription: req.body.richDescription,
-        image: req.body.image,
+        image: imagePath,
         brand: req.body.brand,
         price: req.body.price,
         category: req.body.category,
@@ -125,10 +141,10 @@ router.put(`/:id`, async (req, res) => {
       { new: true },
     );
 
-    if (!product)
+    if (!updatedProduct)
       return res.status(400).send('The product can\'t be updated');
 
-    return res.status(200).send(product);
+    return res.status(200).send(updatedProduct);
   } catch (err) {
     return res.status(500).json({ success: false, error: err });
   }
