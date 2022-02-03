@@ -12,6 +12,7 @@ import { errorHandler } from './helpers/error-handler.js';
 
 const app = express();
 const api = process.env.API_URL;
+const __dirname = new URL('.', import.meta.url).pathname.slice(1);
 
 //Middleware
 app.use(cors());
@@ -19,6 +20,7 @@ app.options('*', cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 app.use(errorHandler);
 
 //Routes
