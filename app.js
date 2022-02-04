@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import cors from 'cors';
+import { resolve } from 'path';
 import { router as productsRoutes } from './routes/products.js';
 import { router as categoriesRoutes } from './routes/categories.js';
 import { router as usersRoutes } from './routes/users.js';
@@ -12,7 +13,6 @@ import { errorHandler } from './helpers/error-handler.js';
 
 const app = express();
 const api = process.env.API_URL;
-const __dirname = new URL('.', import.meta.url).pathname.slice(1);
 
 //Middleware
 app.use(cors());
@@ -20,7 +20,7 @@ app.options('*', cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
-app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
+app.use('/public/uploads', express.static(resolve('public', 'uploads')));
 app.use(errorHandler);
 
 //Routes
